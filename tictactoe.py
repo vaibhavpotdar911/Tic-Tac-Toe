@@ -6,15 +6,15 @@ import time
 from os import system
 
 USER = -1
-COMP = +1
-board = [
-    [0,0,0],
-    [0,0,0],
-    [0,0,0],
+COMPUTER = +1
+game_board = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
 ]
 
 def evaluate(state):
-    if wins(state, COMP):
+    if wins(state, COMPUTER):
         score = +1
     elif wins(state, USER):
         score = -1
@@ -40,33 +40,31 @@ def wins(state, player):
         return False
 
 def game_over(state):
-    return wins(state, USER) or wins(state, COMP)
+    return wins(state, USER) or wins(state, COMPUTER)
 
 def empty_cells(state):
-    cells=[]
-
+    cells = []
     for x, row in enumerate(state):
         for y, cell in enumerate(row):
             if cell == 0:
-                cells.append([x,y])
-
+                cells.append([x, y])
     return cells
 
-def valid_move(x,y):
-    if [x, y] in empty_cells(board):
+def valid_move(x, y):
+    if [x, y] in empty_cells(game_board):
         return True
     else:
         return False
 
 def set_move(x, y, player):
     if valid_move(x, y):
-        board[x][y] = player
+        game_board[x][y] = player
         return True
     else:
         return False
 
-def minimax(state, depth, player):
-    if player == COMP:
+def minimax_algorithm(state, depth, player):
+    if player == COMPUTER:
         best = [-1, -1, -infinity]
     else:
         best = [-1, -1, +infinity]
@@ -76,18 +74,18 @@ def minimax(state, depth, player):
         return [-1, -1, score]
 
     for cell in empty_cells(state):
-        x,y = cell[0], cell[1]
+        x, y = cell[0], cell[1]
         state[x][y] = player
-        score = minimax(state, depth - 1, -player)
+        score = minimax_algorithm(state, depth - 1, -player)
         state[x][y] = 0
         score[0], score[1] = x, y
 
-        if player == COMP:
+        if player == COMPUTER:
             if score[2] > best[2]:
-                best = score    #high value
+                best = score  # high value
         else:
             if score[2] < best[2]:
-                best = score    #low value
+                best = score  # low value
     return best
 
 def clean():
@@ -97,15 +95,13 @@ def clean():
     else:
         system('clear')
 
-def render(state, c_choice, h_choice):
-
+def render(state, computer_choice, user_choice):
     chars = {
-        -1: h_choice,
-        +1: c_choice,
+        -1: user_choice,
+        +1: computer_choice,
         0: ' '
     }
-    str_line = '-----------------------'
-
+    str_line = '---------'
     print('\n' + str_line)
     for row in state:
         for cell in row:
@@ -113,41 +109,35 @@ def render(state, c_choice, h_choice):
             print(f'|{symbol}|', end='')
         print('\n' + str_line)
 
-def ai_turn(c_choice, h_choice):
-    depth = len(empty_cells(board))
-    if depth == 0 or game_over(board):
+def ai_turn(computer_choice, user_choice):
+    depth = len(empty_cells(game_board))
+    if depth == 0 or game_over(game_board):
         return
-    
     clean()
-    print(f'Computer turn [{c_choice}]')
-    render(board, c_choice, h_choice)
-
+    print(f'Computer turn [{computer_choice}]')
+    render(game_board, computer_choice, user_choice)
     if depth == 9:
-        x = choice([0,1,2])
-        y = choice([0,1,2])
+        x = choice([0, 1, 2])
+        y = choice([0, 1, 2])
     else:
-        move = minimax(board, depth, COMP)
+        move = minimax_algorithm(game_board, depth, COMPUTER)
         x, y = move[0], move[1]
-
-    set_move(x, y, COMP)
+    set_move(x, y, COMPUTER)
     time.sleep(1)
 
-
-def user_turn(c_choice, h_choice):
-    depth = len(empty_cells(board))
-    if depth == 0 or game_over(board):
+def user_turn(computer_choice, user_choice):
+    depth = len(empty_cells(game_board))
+    if depth == 0 or game_over(game_board):
         return
-
     move = -1
     moves = {
-        1: [0,0], 2: [0,1], 3: [0,2],
-        4: [1,0], 5: [1,1], 6: [1,2],
-        7: [2,0], 8: [2,1], 9: [2,2],
+        1: [0, 0], 2: [0, 1], 3: [0, 2],
+        4: [1, 0], 5: [1, 1], 6: [1, 2],
+        7: [2, 0], 8: [2, 1], 9: [2, 2],
     }
-
     clean()
-    print(f'Users turn [{h_choice}]')
-    render(board, c_choice, h_choice)
+    print(f'Users turn [{user_choice}]')
+    render(game_board, computer_choice, user_choice)
 
     while move < 1 or move > 9:
         try:
@@ -157,28 +147,22 @@ def user_turn(c_choice, h_choice):
 
             if not can_move:
                 print('Incorrect move')
-
                 move = -1
-
         except (EOFError, KeyboardInterrupt):
             print('Exiting! Bye.')
             exit()
         except (KeyError, ValueError):
             print('Incorrect move')
 
-
 def main():
-
     clean()
-
-    h_choice = ''
-    c_choice = ''
+    user_choice = ''
+    computer_choice = ''
     first = ''
-
-    while h_choice != 'O' and h_choice != 'X':
+    while user_choice != 'O' and user_choice != 'X':
         try:
             print('')
-            h_choice = input('Choose X or O \n Chosen: ').upper()
+            user_choice = input('Choose X or O \n Chosen: ').upper()
 
         except (EOFError, KeyboardInterrupt):
             print('Exiting! Bye.')
@@ -186,12 +170,10 @@ def main():
         except (KeyError, ValueError):
             print('Incorrect choice')
 
-    
-    if h_choice == 'X':
-        c_choice = 'O'
+    if user_choice == 'X':
+        computer_choice = 'O'
     else:
-        c_choice = 'X'
-
+        computer_choice = 'X'
     clean()
     while first != 'Y' and first != 'N':
         try:
@@ -202,32 +184,28 @@ def main():
         except (KeyError, ValueError):
             print("Incorrect choice")
 
-    while len(empty_cells(board)) > 0 and not game_over(board):
+    while len(empty_cells(game_board)) > 0 and not game_over(game_board):
         if first == 'N':
-            ai_turn(c_choice, h_choice)
+            ai_turn(computer_choice, user_choice)
             first = ''
+        user_turn(computer_choice, user_choice)
+        ai_turn(computer_choice, user_choice)
 
-        user_turn(c_choice, h_choice)
-        ai_turn(c_choice, h_choice)       
-
-    if wins(board, USER): 
+    if wins(game_board, USER):
         clean()
-        print(f'User turn [{h_choice}]')
-        render(board, c_choice, h_choice)
+        print(f'User turn [{user_choice}]')
+        render(game_board, computer_choice, user_choice)
         print('User wins!')
-    
-    elif wins(board, COMP):
+    elif wins(game_board, COMPUTER):
         clean()
-        print(f'Computer turn [{c_choice}]')
-        render(board, c_choice, h_choice)
-        print ('Computer wins!')
+        print(f'Computer turn [{computer_choice}]')
+        render(game_board, computer_choice, user_choice)
+        print('Computer wins!')
     else:
         clean()
-        render(board, c_choice, h_choice)
+        render(game_board, computer_choice, user_choice)
         print('Game is DRAW')
-
     exit()
-
 
 if __name__ == '__main__':
     main()
