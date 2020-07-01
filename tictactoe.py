@@ -5,7 +5,7 @@ import platform
 import time
 from os import system
 
-USER= -1
+USER = -1
 COMP = +1
 board = [
     [0,0,0],
@@ -50,17 +50,16 @@ def empty_cells(state):
             if cell == 0:
                 cells.append([x,y])
 
-    
     return cells
 
 def valid_move(x,y):
-    if [x,y] in empty_cells(board):
+    if [x, y] in empty_cells(board):
         return True
     else:
         return False
 
 def set_move(x, y, player):
-    if valid_move(x,y):
+    if valid_move(x, y):
         board[x][y] = player
         return True
     else:
@@ -79,7 +78,7 @@ def minimax(state, depth, player):
     for cell in empty_cells(state):
         x,y = cell[0], cell[1]
         state[x][y] = player
-        score = minimax(state, depth - 1, player)
+        score = minimax(state, depth - 1, -player)
         state[x][y] = 0
         score[0], score[1] = x, y
 
@@ -89,7 +88,6 @@ def minimax(state, depth, player):
         else:
             if score[2] < best[2]:
                 best = score    #low value
-
     return best
 
 def clean():
@@ -112,7 +110,7 @@ def render(state, c_choice, h_choice):
     for row in state:
         for cell in row:
             symbol = chars[cell]
-            print('|{symbol}|', end='')
+            print(f'|{symbol}|', end='')
         print('\n' + str_line)
 
 def ai_turn(c_choice, h_choice):
@@ -121,7 +119,7 @@ def ai_turn(c_choice, h_choice):
         return
     
     clean()
-    print('Computer turn [{c_choice}]')
+    print(f'Computer turn [{c_choice}]')
     render(board, c_choice, h_choice)
 
     if depth == 9:
@@ -148,7 +146,7 @@ def user_turn(c_choice, h_choice):
     }
 
     clean()
-    print('Users turn [{h_choice}]')
+    print(f'Users turn [{h_choice}]')
     render(board, c_choice, h_choice)
 
     while move < 1 or move > 9:
@@ -162,10 +160,10 @@ def user_turn(c_choice, h_choice):
 
                 move = -1
 
-        except(EOFError, KeyboardInterrupt):
+        except (EOFError, KeyboardInterrupt):
             print('Exiting! Bye.')
             exit()
-        except(KeyError, ValueError):
+        except (KeyError, ValueError):
             print('Incorrect move')
 
 
@@ -185,7 +183,7 @@ def main():
         except (EOFError, KeyboardInterrupt):
             print('Exiting! Bye.')
             exit()
-        except(KeyError, ValueError):
+        except (KeyError, ValueError):
             print('Incorrect choice')
 
     
@@ -201,7 +199,7 @@ def main():
         except (EOFError, KeyboardInterrupt):
             print('Exiting! Bye.')
             exit()
-        except(KeyError, ValueError):
+        except (KeyError, ValueError):
             print("Incorrect choice")
 
     while len(empty_cells(board)) > 0 and not game_over(board):
@@ -214,13 +212,13 @@ def main():
 
     if wins(board, USER): 
         clean()
-        print('User turn [{h_choice}]')
+        print(f'User turn [{h_choice}]')
         render(board, c_choice, h_choice)
         print('User wins!')
     
     elif wins(board, COMP):
         clean()
-        print('Computer turn [{c_choice}]')
+        print(f'Computer turn [{c_choice}]')
         render(board, c_choice, h_choice)
         print ('Computer wins!')
     else:
