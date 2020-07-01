@@ -99,4 +99,50 @@ def clean():
     else:
         system('clear')
 
-def render(state, c_choice, h_choice)
+def render(state, c_choice, h_choice):
+
+    chars = {
+        -1: h_choice,
+        +1: c_choice,
+        0: ' '
+    }
+    str_line = '-----------------------'
+
+    print('\n' + str_line)
+    for row in state:
+        for cell in row:
+            symbol = chars[cell]
+            print('|{symbol}|', end='')
+        print('\n' + str_line)
+
+def ai_turn(c_choice, h_choice):
+    depth = len(empty_cells(board))
+    if depth == 0 or game_over(board):
+        return
+    
+    clean()
+    print('Computer turn [{c_choice}]')
+    render(board, c_choice, h_choice)
+
+    if depth == 9:
+        x = choice([0,1,2])
+        y = choice([0,1,2])
+    else:
+        move = minimax(board, depth, COMP)
+        x, y = move[0], move[1]
+
+    set_move(x, y, COMP)
+    time.sleep(1)
+
+
+def user_turn(c_choice, h_choice):
+    depth = len(empty_cells(board))
+    if depth == 0 or game_over(board):
+        return
+
+    move = -1
+    moves = {
+        1: [0,0], 2: [0,1], 3: [0,2],
+        4: [1,0], 5: [1,1], 6: [1,2],
+        7: [2,0], 8: [2,1], 9: [2,2],
+    }
