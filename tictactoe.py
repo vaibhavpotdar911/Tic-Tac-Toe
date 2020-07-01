@@ -146,3 +146,90 @@ def user_turn(c_choice, h_choice):
         4: [1,0], 5: [1,1], 6: [1,2],
         7: [2,0], 8: [2,1], 9: [2,2],
     }
+
+    clean()
+    print('Users turn [{h_choice}]')
+    render(board, c_choice, h_choice)
+
+    while move < 1 or move > 9:
+        try:
+            move = int(input('Use numbers from 1 to 9:'))
+            coord = moves[move]
+            can_move = set_move(coord[0], coord[1], USER)
+
+            if not can_move:
+                print('Incorrect move')
+
+                move = -1
+
+        except(EOFError, KeyboardInterrupt):
+            print('Exiting! Bye.')
+            exit()
+        except(KeyError, ValueError):
+            print('Incorrect move')
+
+
+def main():
+
+    clean()
+
+    h_choice = ''
+    c_choice = ''
+    first = ''
+
+    while h_choice != 'O' and h_choice != 'X':
+        try:
+            print('')
+            h_choice = input('Choose X or O \n Chosen: ').upper()
+
+        except (EOFError, KeyboardInterrupt):
+            print('Exiting! Bye.')
+            exit()
+        except(KeyError, ValueError):
+            print('Incorrect choice')
+
+    
+    if h_choice == 'X':
+        c_choice = 'O'
+    else:
+        c_choice = 'X'
+
+    clean()
+    while first != 'Y' and first != 'N':
+        try:
+            first = input('Do you want to start first? Y/N?: ').upper()
+        except (EOFError, KeyboardInterrupt):
+            print('Exiting! Bye.')
+            exit()
+        except(KeyError, ValueError):
+            print("Incorrect choice")
+
+    while len(empty_cells(board)) > 0 and not game_over(board):
+        if first == 'N':
+            ai_turn(c_choice, h_choice)
+            first = ''
+
+        user_turn(c_choice, h_choice)
+        ai_turn(c_choice, h_choice)       
+
+    if wins(board, USER): 
+        clean()
+        print('User turn [{h_choice}]')
+        render(board, c_choice, h_choice)
+        print('User wins!')
+    
+    elif wins(board, COMP):
+        clean()
+        print('Computer turn [{c_choice}]')
+        render(board, c_choice, h_choice)
+        print ('Computer wins!')
+    else:
+        clean()
+        render(board, c_choice, h_choice)
+        print('Game is DRAW')
+
+    exit()
+
+
+if __name__ == '__main__':
+    main()
